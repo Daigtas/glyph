@@ -1,5 +1,22 @@
 # Glyph changelog
 
+## v2.0.1 — 2026-09-03
+
+Two silent-failure fixes found while dogfooding v2.0.0.
+
+- **Unreadable files were skipped without a word.** `walk_source_files` and the
+  parse worker both swallowed `OSError`, so a file or directory the user could
+  not read simply never appeared in the index — no warning, no count. On a real
+  project this hid five root-level config files, including a Next.js
+  `middleware.ts`, from an index that otherwise looked complete. Scans now
+  report every path they could not read, and `glyph refresh` shows a per-project
+  count.
+- **`glyph fallow <project> dupes` silently ingested nothing against Fallow 3.x.**
+  The ingester looked for a top-level `duplications` key with `files[].path`;
+  Fallow 3.x emits `clone_groups` with `instances[].file`. Every run reported
+  "0 issues" and success. Both shapes are now accepted — the same project went
+  from 0 to 4,261 duplicate blocks, matching Fallow's own `clone_instances` stat.
+
 ## v2.0.0 — 2026-09-03
 
 Correctness rewrite. v1's graph was largely non-functional; this fixes the

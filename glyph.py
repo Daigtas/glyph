@@ -19,7 +19,7 @@ from datetime import datetime
 
 from tree_sitter import Language, Parser, Node
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 SCHEMA_VERSION = 2
 
 # ═══════════════════════════════════════════════════════════════════
@@ -786,16 +786,23 @@ def hash_bytes(data: bytes) -> str:
     return hashlib.blake2b(data, digest_size=16).hexdigest()
 
 
-def walk_source_files(root: str):
+def walk_source_files(root: str, unreadable_dirs: list = None):
     """Yield (rel, abspath, tag, size, mtime). os.scandir avoids a second
-    stat() per entry, which matters on trees with tens of thousands of files."""
+    stat() per entry, which matters on trees with tens of thousands of files.
+
+    Directories we cannot enter are appended to `unreadable_dirs` rather than
+    dropped silently — an index that is quietly missing files is worse than
+    one that says so.
+    """
     root = os.path.abspath(root)
     pending = [root]
     while pending:
         d = pending.pop()
         try:
             entries = list(os.scandir(d))
-        except OSError:
+        except OSError as e:
+            if unreadable_dirs is not None:
+                unreadable_dirs.append((os.path.relpath(d, root), e.strerror or str(e)))
             continue
         for e in entries:
             try:
@@ -827,17 +834,18 @@ def _parse_one(job):
     try:
         with open(abspath, "rb") as f:
             data = f.read()
-    except OSError:
-        return None
+    except OSError as e:
+        return (rel, tag, None, 0, None, e.strerror or str(e))
     h = hash_bytes(data)
     line_count = data.count(b"\n") + 1
     if h == old_hash:
-        return (rel, tag, h, line_count, None)   # content identical, skip parse
+        return (rel, tag, h, line_count, None, None)   # identical, skip parse
     try:
         out = EXTRACTORS[tag](data, tag)
-    except Exception:
-        out = {"symbols": [], "edges": [], "imports": []}
-    return (rel, tag, h, line_count, out)
+    except Exception as e:
+        return (rel, tag, h, line_count, {"symbols": [], "edges": [], "imports": []},
+                f"parse failed: {type(e).__name__}")
+    return (rel, tag, h, line_count, out, None)
 
 
 def _resolve_module(module: str, from_rel: str, path_index: dict):
@@ -922,7 +930,8 @@ def scan_project(name: str, root: str, full: bool = False, jobs: int = 0,
                 "ON CONFLICT(name) DO UPDATE SET path=excluded.path", (name, root))
     project_id = cur.execute("SELECT id FROM projects WHERE name=?", (name,)).fetchone()[0]
 
-    found = list(walk_source_files(root))
+    unreadable_dirs: list = []
+    found = list(walk_source_files(root, unreadable_dirs))
     found_rels = {f[0] for f in found}
 
     existing = {}
@@ -969,17 +978,23 @@ def scan_project(name: str, root: str, full: bool = False, jobs: int = 0,
     #    for small batches the pool costs more than it saves.
     if jobs == 0:
         jobs = min(os.cpu_count() or 4, 8)
-    results = []
+    raw = []
     if jobs > 1 and len(jobs_list) > 64:
         with ProcessPoolExecutor(max_workers=jobs) as pool:
-            for r in pool.map(_parse_one, jobs_list, chunksize=32):
-                if r:
-                    results.append(r)
+            raw = [r for r in pool.map(_parse_one, jobs_list, chunksize=32) if r]
     else:
-        for job in jobs_list:
-            r = _parse_one(job)
-            if r:
-                results.append(r)
+        raw = [r for r in (_parse_one(j) for j in jobs_list) if r]
+
+    # Split off files that could not be read or parsed so they are reported
+    # rather than quietly missing from the index.
+    results, failures = [], []
+    for rel, tag, h, lc, out, err in raw:
+        if h is None:
+            failures.append((rel, err))
+        else:
+            results.append((rel, tag, h, lc, out))
+            if err:
+                failures.append((rel, err))
 
     now = int(time.time())
     stat_by_rel = {f[0]: (f[3], f[4]) for f in found}
@@ -1079,9 +1094,23 @@ def scan_project(name: str, root: str, full: bool = False, jobs: int = 0,
         print(f"[glyph] {name}: {len(reparsed)} parsed, {unchanged} skipped — "
               f"{sym_count} symbols, {edge_count} edges ({linked} linked) "
               f"— {mode} in {time.time()-t0:.2f}s")
+    _warn_skipped(failures, unreadable_dirs, quiet)
     return {"project": name, "total": len(found), "parsed": len(reparsed),
             "skipped": unchanged, "symbols": sym_count, "edges": edge_count,
-            "linked": linked, "seconds": round(time.time() - t0, 3)}
+            "linked": linked, "seconds": round(time.time() - t0, 3),
+            "unreadable": [f for f, _ in failures] + [d for d, _ in unreadable_dirs]}
+
+
+def _warn_skipped(failures, unreadable_dirs, quiet: bool) -> None:
+    """Say out loud what did not make it into the index."""
+    if quiet or (not failures and not unreadable_dirs):
+        return
+    total = len(failures) + len(unreadable_dirs)
+    print(f"  ⚠ {total} path(s) skipped — the index is incomplete:")
+    for path, why in (failures + unreadable_dirs)[:8]:
+        print(f"      {path} — {why}")
+    if total > 8:
+        print(f"      ... and {total - 8} more")
 
 
 def _repair_edges(cur, project_id: int, root: str, import_rows=None) -> int:
@@ -1488,8 +1517,11 @@ def refresh_all(quiet: bool = False, as_json: bool = False):
             if r.get("error"):
                 print(f"  {r['project']:<16} error: {r['error']}")
             else:
+                warn = len(r.get("unreadable") or [])
+                suffix = f"  ⚠ {warn} unreadable" if warn else ""
                 print(f"  {r['project']:<16} {r.get('parsed', 0)} parsed, "
-                      f"{r.get('skipped', 0)} unchanged  ({r.get('seconds', 0)}s)")
+                      f"{r.get('skipped', 0)} unchanged  "
+                      f"({r.get('seconds', 0)}s){suffix}")
     return results
 
 
@@ -1919,20 +1951,45 @@ def _ingest_health(data, pid, path_to_id, now, version, issues):
 
 
 def _ingest_dupes(data, pid, path_to_id, now, version, issues):
-    """v1 appended to `paths` inside the per-file loop and rebuilt the message
-    each time, so every row in a group got a different, truncated peer list."""
-    for group in data.get("duplications", []):
-        members = group.get("files", [])
-        peers = [d.get("path", "") for d in members]
-        for d in members:
-            p = d.get("path", "")
-            start, end = d.get("start_line", 0), d.get("end_line", 0)
-            others = [x for x in peers if x != p]
-            issues.append((pid, path_to_id.get(p), None, "dupes", "duplicate_block",
-                           "warning", start, 0, None, None, max(end - start, 0), None,
-                           None, f"Duplicated block ({max(end-start,0)} lines), "
-                                 f"also in: {', '.join(others) or '—'}",
-                           "[]", now, version))
+    """Ingest duplicate-block findings.
+
+    Fallow 3.x reports `clone_groups` with an `instances` list keyed on
+    "file"; 1.x/2.x reported `duplications` with `files` keyed on "path".
+    Only the old shape was handled, so every v3 run silently ingested zero
+    duplications while reporting success. Both are accepted now.
+    """
+    groups = []
+    for g in data.get("clone_groups") or []:
+        members = [
+            (i.get("file") or i.get("path") or "",
+             i.get("start_line", 0), i.get("end_line", 0))
+            for i in (g.get("instances") or [])
+        ]
+        if members:
+            groups.append(members)
+    if not groups:                                   # fallback: pre-3.x shape
+        for g in data.get("duplications") or []:
+            members = [
+                (d.get("path") or d.get("file") or "",
+                 d.get("start_line", 0), d.get("end_line", 0))
+                for d in (g.get("files") or [])
+            ]
+            if members:
+                groups.append(members)
+
+    for members in groups:
+        peers = [m[0] for m in members]
+        for path, start, end in members:
+            others = [x for x in peers if x != path]
+            span = max(end - start, 0)
+            issues.append((
+                pid, path_to_id.get(path), None, "dupes", "duplicate_block",
+                "warning", start, 0, None, None, span, None, None,
+                f"Duplicated block ({span} lines), also in: "
+                f"{', '.join(others[:4]) or '—'}"
+                + (f" (+{len(others) - 4} more)" if len(others) > 4 else ""),
+                "[]", now, version,
+            ))
 
 
 def issues_list(project: str, kind: str = None, severity: str = None,
