@@ -121,7 +121,7 @@ glyph refresh
 
 ```bash
 # Clone and install
-git clone https://github.com/boottify/glyph.git
+git clone https://github.com/Daigtas/glyph.git
 cd glyph
 ./install.sh
 ```
@@ -129,7 +129,7 @@ cd glyph
 Or one-liner:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/boottify/glyph/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Daigtas/glyph/main/install.sh | bash
 ```
 
 **Requirements:** Python 3.10+, pip, git
@@ -276,7 +276,7 @@ Symbol kinds (3,161-file repo):
 Glyph is a single Python file. It's designed to be readable and hackable.
 
 ```bash
-git clone https://github.com/boottify/glyph.git
+git clone https://github.com/Daigtas/glyph.git
 cd glyph
 python3 -m venv venv
 source venv/bin/activate
