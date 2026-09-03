@@ -1,4 +1,7 @@
-![Glyph](data:image/jpeg;base64,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) Glyph
+<h1>
+  <img src="assets/logo-128.png" alt="" width="32" height="32" align="absmiddle">
+  Glyph
+</h1>
 
 > **Carve meaning into your codebase.**
 
@@ -8,6 +11,21 @@
 [![Tools](https://img.shields.io/badge/Boottify-Tools-%23d2f800?style=flat-square)](https://boottify.com/tools)
 
 Glyph is a **lightning-fast, zero-LLM-cost codebase indexer** that builds a knowledge graph of your source code using tree-sitter AST parsing. It answers the questions that slow you down: *Where is X defined? What calls this? What are the most-connected symbols? Show me the call chain from A to B.*
+
+> ### 🚨 v2.0.0 — correctness rewrite
+>
+> If you used v1.x, **re-index**. v1 had three defects that made most of the graph
+> unusable, all now fixed and regression-tested:
+>
+> - Symbol names were extracted with **byte offsets sliced into a decoded string** —
+>   a single non-ASCII character corrupted every later name in a file.
+>   Measured on a live 57,121-symbol index: **46% of names were garbage.**
+> - Every edge's `source_id` was hardcoded `None`, so `deps`, `path` and `bridges`
+>   **returned nothing on any project, ever** (0 of 18,927 edges had a source).
+> - Incremental scans deleted inbound edges without rebuilding them —
+>   **editing 10 files destroyed 35% of the graph.**
+>
+> Plus a **3× faster** full scan. See [CHANGES.md](CHANGES.md).
 
 ---
 
@@ -42,8 +60,10 @@ We tried [Graphify](https://github.com/safishamsi/graphify) — an ambitious too
 | **Multi-project** | ❌ | ✅ One DB, many projects |
 | **Installation** | npm + Node version dance | `pip install` + one script |
 | **Languages** | TS, Python | TS/TSX/JS/JSX, Python, Go, Bash |
+| **Agent-ready output** | ❌ | ✅ `--json` on every command, plus `glyph context` |
+| **Index self-check** | ❌ | ✅ `glyph doctor` |
 | **Auto-generated maps** | ❌ | ✅ `glyph map` generates `PROJECT_MAP.md` |
-| **Lines of code** | ~5,000+ (complex multi-module) | **~1,200** (single file, readable) |
+| **Lines of code** | ~5,000+ (complex multi-module) | **~2,200** (single file, readable) |
 
 ---
 
@@ -76,7 +96,23 @@ glyph map myproject
 
 # Stats at a glance
 glyph stats myproject
-  → boottify: 2,525 files, 31,348 symbols, 11,090 edges
+  → boottify: 3,161 files, 45,191 symbols, 74,589 edges
+
+# Everything about one symbol, as JSON — for AI agents
+glyph context myproject sendEmail
+  → definition + line range + every caller + every callee + the file's other symbols
+
+# Which files change often AND are structurally central? (needs `glyph history`)
+glyph hotspots myproject
+  → lib/auth.ts — 4 commits, 81 dependents
+
+# Is the index healthy?
+glyph doctor
+  → malformed names 0 [ok] · dangling targets 0 [ok] · all checks passed
+
+# Re-scan every indexed project (cheap enough to cron)
+glyph refresh
+  → boottify 0 parsed, 3161 unchanged (0.08s)
 ```
 
 ---
@@ -163,29 +199,39 @@ glyph list                # See all indexed projects
 
 ## Real-World Performance
 
-Indexed against **daigtas-platform** (Boottify SaaS — 2,525 source files):
+Measured on two production Next.js codebases, v1.2.0 vs v2.0.0 on the same machine:
 
-| Metric | Value |
-|--------|-------|
-| Files indexed | 2,525 (.ts, .tsx, .js, .jsx) |
-| Symbols extracted | **31,348** |
-| Edges resolved | **11,090** |
-| First scan time | ~30 seconds |
-| Incremental (3 files changed) | ~120ms |
-| Database size | 8.2 MB |
-| LLM cost | **$0.00** |
+| Metric | v1.2.0 | v2.0.0 |
+|--------|--------|--------|
+| Full scan — 3,161 files | 7.79 s | **2.57 s** (3.0× faster) |
+| Full scan — 1,576 files | 3.31 s | **0.99 s** (3.3× faster) |
+| No-op incremental scan | 0.29 s | **0.17 s** |
+| `glyph refresh`, 5,015 files across 3 projects | — | **0.28 s** |
+| Edges extracted (1,576-file repo) | 3,265 | **31,491** |
+| Edges resolved to a symbol | **0** | **14,048** |
+| Corrupt symbol names | **46%** | **0%** |
+| LLM cost | $0.00 | **$0.00** |
+
+Accuracy spot-checked against `grep` on a 1,576-file repo: glyph reports 260 caller
+files for `withAuth` vs grep's 263, and 405 vs 401 for the `db` singleton — within
+1-2%, with the difference being import-only files that grep counts differently.
 
 ```
-Symbol kinds:
-  const            23,956
-  function          4,216
-  interface         2,011
-  let                 502
-  type                269
-  method              253
-  component            94
-  class                34
+Symbol kinds (3,161-file repo):
+  const            35,195
+  function          6,064
+  interface         2,123
+  let               1,142
+  type                283
+  method              184
+  component           167
+  class                27
 ```
+
+> **What "resolved" means.** Roughly 45-50% of extracted edges resolve to a symbol
+> *inside* the project; the rest are calls into `node_modules`/stdlib, which Glyph
+> deliberately does not index. An unresolved edge means "points outside the
+> project", not "not called".
 
 ---
 
@@ -212,11 +258,15 @@ Symbol kinds:
 
 ## Roadmap
 
-- [ ] `glyph watch` — filesystem watcher for live incremental updates
-- [ ] Source-level edge resolution (which file does `call` point to)
+- [x] `glyph watch` — polling watcher for live incremental updates *(v2.0)*
+- [x] Source-level edge resolution — scope-tracked, import- and visibility-aware *(v2.0)*
+- [x] JSON output on every command + `glyph context` for AI agents *(v2.0)*
+- [x] `glyph doctor` — index integrity self-check *(v2.0)*
+- [x] `glyph hotspots` — churn × structural centrality from git history *(v2.0)*
 - [ ] Community detection (Louvain algorithm)
 - [ ] HTML graph visualization
 - [ ] PR diff mode — "what changed in the graph between commits?"
+- [ ] Rust / Java / C# extractors
 - [ ] VSCode extension
 
 ---
@@ -234,7 +284,10 @@ pip install tree-sitter tree-sitter-typescript tree-sitter-python tree-sitter-go
 python3 glyph.py scan test /path/to/some/code
 ```
 
-Pull requests welcome. See `glyph.py` — it's ~1,200 lines with clear sections.
+Run `glyph doctor` after any change to the extractors — it catches malformed
+symbol names, dangling edge targets, and a graph where nothing resolves.
+
+Pull requests welcome. See `glyph.py` — it's ~2,200 lines with clear sections.
 
 ---
 
