@@ -1,4 +1,4 @@
-# [https://cdn.boottify.com/uploads/logos/glyph-logo.png] Glyph
+# ![Glyph](https://cdn.boottify.com/uploads/logos/glyph-logo.png) Glyph
 
 > **Carve meaning into your codebase.**
 
